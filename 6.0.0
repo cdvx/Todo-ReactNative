@@ -1,0 +1,13 @@
+debug Available platforms: iOS, Android
+debug Targeted platforms: iOS, Android
+debug Getting project config for iOS...
+debug Getting project config for Android...
+debug Package to link: react-native-vector-icons@
+debug Error: Failed to get dependency config
+    at getDependencyConfig (/Users/cdvx/Desktop/Todo-ReactNative/TodoV2/node_modules/@react-native-community/cli/build/commands/link/getDependencyConfig.js:49:11)
+    at Object.link [as func] (/Users/cdvx/Desktop/Todo-ReactNative/TodoV2/node_modules/@react-native-community/cli/build/commands/link/link.js:97:61)
+    at Promise.resolve.then (/Users/cdvx/Desktop/Todo-ReactNative/TodoV2/node_modules/@react-native-community/cli/build/cliEntry.js:152:22)
+    at process._tickCallback (internal/process/next_tick.js:43:7)
+    at Function.Module.runMain (internal/modules/cjs/loader.js:778:11)
+    at startup (internal/bootstrap/node.js:300:19)
+    at bootstrapNodeJSCore (internal/bootstrap/node.js:826:3)

@@ -1,19 +1,17 @@
-import React from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
-import { ExpoLinksView } from '@expo/samples';
+import React, { Component } from 'react';
+import { StyleSheet, View,Text, Dimensions } from 'react-native';
 
-export default class LinksScreen extends React.Component {
-  static navigationOptions = {
-    title: 'Links',
-  };
-
+export default class Todo extends Component {
   render() {
+    const {title, detail, tags, categories} = this.props;
+    console.log('\n\n >>>> ', title, detail)
     return (
-      <ScrollView style={styles.container}>
-        {/* Go ahead and delete ExpoLinksView and replace it with your
-           * content, we just wanted to provide you with some helpful links */}
-        <ExpoLinksView />
-      </ScrollView>
+      <View style={styles.container}>
+        <Text style={{margin: 10}} >Task: {title}</Text>
+        <Text style={{margin: 10}}>{detail}</Text>
+        <Text style={{margin: 10}}>Tags: {tags}</Text>
+        <Text style={{margin: 10}}>Categories: {categories}</Text>
+      </View>
     );
   }
 }
@@ -21,7 +19,21 @@ export default class LinksScreen extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 15,
-    backgroundColor: '#fff',
+    width: Dimensions.get('window').width * 0.98,
+    flexDirection: "column",
+    flexWrap: "nowrap",
+    padding: 15,
+    marginTop: 4,
+    marginLeft: 3,
+    marginBottom:3,
+    borderRadius: 10,
+    elevation: 0.5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    // borderColor: "black",
+    // borderWidth: 2,
+    backgroundColor: '#f0f8ff',
   },
 });

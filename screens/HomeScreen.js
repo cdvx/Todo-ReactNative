@@ -1,188 +1,208 @@
-import React from 'react';
+import React, { Component } from 'react';
 import {
+  // AsyncStorage,
   Image,
   Platform,
+  Button,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
+  FlatList,
   TouchableOpacity,
   View,
 } from 'react-native';
-import { WebBrowser } from 'expo';
 
-import { MonoText } from '../components/StyledText';
+import { connect } from "react-redux";
 
-export default class HomeScreen extends React.Component {
+import { Container, Header, H1, H3, H2, Content, Toast } from "native-base";
+// import { Button } from 'react-native-material-design';
+// import AsyncStorage from '@react-native-community/async-storage';
+
+import AsyncStorage from '@react-native-community/async-storage';
+// import { WebBrowser } from 'expo';
+
+import Todo from "./LinksScreen";
+
+import ModalExample from "./SettingsScreen";
+
+// import { MonoText } from '../components/StyledText';
+// import { TextInput } from 'react-native-gesture-handler';
+
+export default class HomeScreen extends Component {
   static navigationOptions = {
     header: null,
   };
 
+  state = {
+    data : Promise.resolve(_retrieveData()).then((result)=>(result))
+  }
+
+  componentWillMount(){
+    const data = _retrieveData()
+    Promise.resolve(data).then((result)=>{
+      console.log('\n\n this part runs', result);
+      this.setState({result})
+    })
+  }
+
+  _renderItem = ({item}) => {
+    console.log("\n\n renderring shts here>>>", item)
+    return (
+      <Todo 
+      title={item.title} 
+      detail={item.detail} 
+      tags={item.tags}
+      />
+      );
+      
+  };
+
+  _handleTextChange = event => {
+    this._storeData(todos)
+    // console.warn("\nclicked >>", todos, '\n\n')
+
+  };
+
+  _storeData = async (data)=> {
+    try {
+      data = JSON.stringify(data)
+      // console.warn('\n\n\ data here 11>>> ', data)
+      await AsyncStorage.setItem( "tasks", data)
+    } catch (error){
+      console.error('\n\n error here setting>>>', error)
+    }
+  };
+
+
   render() {
+    
+    console.log(`\n\n state  title >>>${this.state.data._55}\n\n`)
+    const { data } = this.state.data ? this.state : null
+    console.log(`\n\n title >>>${data}\n\n`)
+    // console.log(`\n\n title ${title} \n\n details ${detail} \n\n`)
     return (
       <View style={styles.container}>
-        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-          <View style={styles.welcomeContainer}>
-            <Image
-              source={
-                __DEV__
-                  ? require('../assets/images/robot-dev.png')
-                  : require('../assets/images/robot-prod.png')
-              }
-              style={styles.welcomeImage}
-            />
-          </View>
-
-          <View style={styles.getStartedContainer}>
-            {this._maybeRenderDevelopmentModeWarning()}
-
-            <Text style={styles.getStartedText}>Get started by opening</Text>
-
-            <View style={[styles.codeHighlightContainer, styles.homeScreenFilename]}>
-              <MonoText style={styles.codeHighlightText}>screens/HomeScreen.js</MonoText>
-            </View>
-
-            <Text style={styles.getStartedText}>
-              Change this text and your app will automatically reload.
-            </Text>
-          </View>
-
-          <View style={styles.helpContainer}>
-            <TouchableOpacity onPress={this._handleHelpPress} style={styles.helpLink}>
-              <Text style={styles.helpLinkText}>Help, it didn’t automatically reload!</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-
-        <View style={styles.tabBarInfoContainer}>
-          <Text style={styles.tabBarInfoText}>This is a tab bar. You can edit it in:</Text>
-
-          <View style={[styles.codeHighlightContainer, styles.navigationFilename]}>
-            <MonoText style={styles.codeHighlightText}>navigation/MainTabNavigator.js</MonoText>
-          </View>
+      
+        <View style={styles.welcomeContainer}>
+          <Text styel={styles.textS}>TODO</Text>
         </View>
+        <View style={styles.welcomeUser}>
+        {/* <Container> */}
+        <Content>
+          <H1 style={{fontWeight: "bold"}}> Hey User!</H1>
+          <Text style={{padding: 6}}>
+            Looks like you've got work to do!
+          </Text>
+
+        </Content>
+        
+      </View>
+        {console.log("\n\n data ringing >>", data._55)}
+        {!data && <Text>No tasks added!</Text>}
+        {data && <FlatList data={data._55} renderItem={this._renderItem} />
+        }
+        <ModalExample  this_obj={this} storeData={this._storeData}/>
+        
       </View>
     );
   }
-
-  _maybeRenderDevelopmentModeWarning() {
-    if (__DEV__) {
-      const learnMoreButton = (
-        <Text onPress={this._handleLearnMorePress} style={styles.helpLinkText}>
-          Learn more
-        </Text>
-      );
-
-      return (
-        <Text style={styles.developmentModeText}>
-          Development mode is enabled, your app will be slower but you can use useful development
-          tools. {learnMoreButton}
-        </Text>
-      );
-    } else {
-      return (
-        <Text style={styles.developmentModeText}>
-          You are not in development mode, your app will run at full speed.
-        </Text>
-      );
-    }
-  }
-
-  _handleLearnMorePress = () => {
-    WebBrowser.openBrowserAsync('https://docs.expo.io/versions/latest/guides/development-mode');
-  };
-
-  _handleHelpPress = () => {
-    WebBrowser.openBrowserAsync(
-      'https://docs.expo.io/versions/latest/guides/up-and-running.html#can-t-see-your-changes'
-    );
-  };
 }
 
+_addKeysToTasks = todos => {
+  const todos_ = todos.map((todo)=>(Object.assign(todo, { key: todo.title })))
+  console.log('\n\n tidoss', todos_)
+  return todos_
+};
+
+_retrieveData = async () => {
+  try {
+    const data = await AsyncStorage.getItem('tasks');
+    Promise.resolve(data)
+    // console.warn('\n\n >>>', data,'\n\n')
+    return data !== null ? _addKeysToTasks(JSON.parse(data)) : null;
+  } catch (error){
+    console.error('\n\n error here retrieving>>>', error)
+  }
+};
+
+
+const todos = [
+  {title: "This one", detail: "this detail", tags: "2345", categories:'work'},
+  {title: "This one too", detail: "this detail tooo", tags: "2345", categories:'school'}
+];
+
+
+export const mapStateToProps = state => state;
+
+export const mapDispatchToProps = dispatch => ({
+  loginUser: loginData => dispatch(login(loginData))
+});
+
+// export default connect(mapStateToProps, mapDispatchToProps)(Login);
+
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  developmentModeText: {
-    marginBottom: 20,
-    color: 'rgba(0,0,0,0.4)',
-    fontSize: 14,
-    lineHeight: 19,
-    textAlign: 'center',
-  },
-  contentContainer: {
-    paddingTop: 30,
+  container: { flex: 1,
+  // justifyContent: "center",
+  width: "100%",
+  flexDirection: "column",
+  // alignItems: "flex-end",
+  alignItems: "flex-start",
+  backgroundColor: "#f0f8ff",
+  paddingTop: 0,
+},
+welcomeUser: {
+  flexDirection: 'row',
+    alignItems: 'flex-end',
+    width: "100%",
+    justifyContent: "center",
+    // borderRadius: 15,
+    height: 75,
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: "#f0f8ff",
+    // backgroundColor: "blue",
+},
+  textS: {
+    flex: 4,
+    fontSize: 25,
+    marginBottom:30, 
+    flexDirection:"column",
+    alignItems: "center",
+    color: "blue"
   },
   welcomeContainer: {
-    alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  welcomeImage: {
-    width: 100,
-    height: 80,
-    resizeMode: 'contain',
-    marginTop: 3,
-    marginLeft: -10,
-  },
-  getStartedContainer: {
-    alignItems: 'center',
-    marginHorizontal: 50,
-  },
-  homeScreenFilename: {
-    marginVertical: 7,
-  },
-  codeHighlightText: {
-    color: 'rgba(96,100,109, 0.8)',
-  },
-  codeHighlightContainer: {
-    backgroundColor: 'rgba(0,0,0,0.05)',
-    borderRadius: 3,
-    paddingHorizontal: 4,
-  },
-  getStartedText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    lineHeight: 24,
-    textAlign: 'center',
-  },
-  tabBarInfoContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    ...Platform.select({
-      ios: {
-        shadowColor: 'black',
-        shadowOffset: { height: -3 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
-      },
-      android: {
-        elevation: 20,
-      },
-    }),
-    alignItems: 'center',
-    backgroundColor: '#fbfbfb',
-    paddingVertical: 20,
-  },
-  tabBarInfoText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    textAlign: 'center',
-  },
-  navigationFilename: {
-    marginTop: 5,
-  },
-  helpContainer: {
-    marginTop: 15,
-    alignItems: 'center',
-  },
-  helpLink: {
-    paddingVertical: 15,
-  },
-  helpLinkText: {
-    fontSize: 14,
-    color: '#2e78b7',
-  },
+      flexDirection: 'row',
+      alignItems: 'flex-end',
+      width: "100%",
+      justifyContent: "center",
+      // borderRadius: 15,
+      height: 85,
+      padding: 10,
+      backgroundColor: "#f0f8ff",
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.8,
+      shadowRadius: 2,
+      elevation: 2,
+      // borderColor: "white",
+      // borderWidth: 5,
+    },
+    input: {
+      fontSize: 15,
+      borderColor: 'gray',
+      padding: 2,
+      marginTop: 3,
+      width: "100%",
+      borderWidth: 2,
+      borderRadius: 1,
+      color: "blue"
+    },
+    list: {
+      flex:1,
+      width:"100%",
+      flexDirection: "row",
+      backgroundColor: 'gray'
+    }
 });
